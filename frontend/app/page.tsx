@@ -93,173 +93,175 @@ const formatDate= (dateString:string)=>{
 
 
   return (
-   <div className="w-2/3 flex flex-col gap-4">
-    <div className="flex justify-between rounded-2x1 border-2 border-warning/10
-    border-dashed bg-warning/5 p-5">
+    <div className="flex w-full flex-col gap-4 sm:gap-5">
+      <header className="flex items-center justify-between">
+        <div>
+          <p className="text-sm text-base-content/60">Bonjour</p>
+          <h1 className="text-xl font-bold sm:text-2xl">Mes transactions</h1>
+        </div>
+        <button
+          className="btn btn-warning btn-sm sm:btn-md"
+          onClick={() => (document.getElementById("my_modal_3") as HTMLDialogElement).showModal()}
+        >
+          <PlusCircle className="h-4 w-4" />
+          <span className="hidden sm:inline">Ajouter une transaction</span>
+          <span className="sm:hidden">Ajouter</span>
+        </button>
+      </header>
 
-      <div className="flex flex-col gap-1">
-        <div className="badge badge-soft">
-            <Wallet className="w-4 h-4"/>
+      <section className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <div className="rounded-2xl border border-warning/10 border-dashed bg-warning/5 p-4 sm:p-5">
+          <div className="badge badge-soft gap-1">
+            <Wallet className="h-4 w-4" />
             Votre solde
           </div>
-
-        <div className="stat-value">
-          {balance.toFixed(2)} Fcfa
+          <div className="mt-2 text-2xl font-bold break-words">{balance.toFixed(2)} Fcfa</div>
         </div>
-      </div>
 
-      <div className="flex flex-col gap-1">
-        <div className="badge badge-soft badg-success">
-            <ArrowUpCircle className="w-4 h-4"/>
+        <div className="rounded-2xl border border-success/10 border-dashed bg-success/5 p-4 sm:p-5">
+          <div className="badge badge-soft badge-success gap-1">
+            <ArrowUpCircle className="h-4 w-4" />
             Revenus
           </div>
-
-        <div className="stat-value">
-          {income.toFixed(2)} Fcfa
+          <div className="mt-2 text-2xl font-bold break-words">{income.toFixed(2)} Fcfa</div>
         </div>
-      </div>
 
-      <div className="flex flex-col gap-1">
-        <div className="badge badge-soft badge-error">
-            <ArrowDownCircle className="w-4 h-4"/>
-            Depenses
+        <div className="rounded-2xl border border-error/10 border-dashed bg-error/5 p-4 sm:p-5">
+          <div className="badge badge-soft badge-error gap-1">
+            <ArrowDownCircle className="h-4 w-4" />
+            Dépenses
           </div>
-
-        <div className="stat-value">
-          {expense.toFixed(2)} Fcfa
+          <div className="mt-2 text-2xl font-bold break-words">{expense.toFixed(2)} Fcfa</div>
         </div>
-      </div>      
+      </section>
 
-
-    </div>
-
-    <div className="rounded-2x1 border-2 border-warning/10
-    border-dashed bg-warning/5 p-5">
-      <div className="flex justify-between items-center mb-1">
-  
+      <div className="rounded-2xl border border-warning/10 border-dashed bg-warning/5 p-4 sm:p-5">
+        <div className="mb-2 flex items-center justify-between gap-3">
           <div className="badge badge-soft badge-warning gap-1">
-            <Activity className="w-4 h-4"/>
+            <Activity className="h-4 w-4" />
             Dépenses vs Revenus
           </div>
-        <div>{ratio.toFixed(0)}%</div>
-
-       
-
+          <div className="text-sm font-semibold">{ratio.toFixed(0)}%</div>
+        </div>
+        <progress className="progress progress-warning w-full" value={ratio} max={100} />
       </div>
 
-      <progress
-      className="progress progress-warning w-full"
-      value={ratio}
-      max={100}
-      >
+      <div className="hidden overflow-x-auto rounded-2xl border border-warning/10 border-dashed bg-warning/5 md:block">
+        <table className="table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Description</th>
+              <th>Montant</th>
+              <th>Date</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {transactions.map((transaction, index) => (
+              <tr key={transaction.id}>
+                <th>{index + 1}</th>
+                <td className="max-w-64 break-words">{transaction.text}</td>
+                <td>
+                  <span className="flex items-center gap-2 font-semibold">
+                    {transaction.amount > 0 ? (
+                      <TrendingUp className="h-5 w-5 text-success" />
+                    ) : (
+                      <TrendingDown className="h-5 w-5 text-error" />
+                    )}
+                    {transaction.amount > 0 ? `+${transaction.amount}` : transaction.amount}
+                  </span>
+                </td>
+                <td className="whitespace-nowrap">{formatDate(transaction.created_at)}</td>
+                <td>
+                  <button
+                    onClick={() => deleteTransaction(transaction.id)}
+                    className="btn btn-error btn-soft btn-sm"
+                    title="Supprimer"
+                  >
+                    <Trash className="h-4 w-4" />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
-      </progress>
+      <div className="grid grid-cols-1 gap-3 md:hidden">
+        {transactions.map((transaction) => (
+          <article key={transaction.id} className="rounded-2xl border border-warning/10 border-dashed bg-warning/5 p-4">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="break-words font-semibold">{transaction.text}</p>
+                <p className="mt-1 text-xs text-base-content/60">{formatDate(transaction.created_at)}</p>
+              </div>
+              <button
+                onClick={() => deleteTransaction(transaction.id)}
+                className="btn btn-error btn-soft btn-sm btn-square shrink-0"
+                title="Supprimer"
+              >
+                <Trash className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="mt-3 flex items-center gap-2 text-lg font-bold">
+              {transaction.amount > 0 ? (
+                <TrendingUp className="h-5 w-5 text-success" />
+              ) : (
+                <TrendingDown className="h-5 w-5 text-error" />
+              )}
+              <span>{transaction.amount > 0 ? `+${transaction.amount}` : transaction.amount} Fcfa</span>
+            </div>
+          </article>
+        ))}
+        {transactions.length === 0 && (
+          <div className="rounded-2xl border border-dashed border-base-300 p-8 text-center text-base-content/60">
+            Aucune transaction pour le moment
+          </div>
+        )}
+      </div>
 
+      <dialog id="my_modal_3" className="modal backdrop-blur">
+        <div className="modal-box mx-3 max-w-md border border-warning/10 border-dashed p-5 sm:p-6">
+          <form method="dialog">
+            <button className="btn btn-circle btn-ghost btn-sm absolute right-2 top-2" aria-label="Fermer">✕</button>
+          </form>
+          <h3 className="text-lg font-bold">Ajouter une transaction</h3>
+          <div className="mt-4 flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
+              <label className="label px-0">Texte</label>
+              <input
+                type="text"
+                name="text"
+                value={text}
+                onChange={(event) => setText(event.target.value)}
+                placeholder="Entrez la description..."
+                className="input w-full"
+              />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label className="label px-0">Montant (négatif = dépense, positif = revenu)</label>
+              <input
+                type="number"
+                name="amount"
+                value={amount}
+                onChange={(event) => setAmount(event.target.value === "" ? "" : Number(event.target.value))}
+                placeholder="Entrez le montant..."
+                className="input w-full"
+              />
+            </div>
+
+            <button className="btn btn-warning w-full" onClick={addTransaction} disabled={loading}>
+              <PlusCircle className="h-4 w-4" />
+              Ajouter
+            </button>
+          </div>
+        </div>
+        <form method="dialog" className="modal-backdrop">
+          <button>Fermer</button>
+        </form>
+      </dialog>
     </div>
-
-  {/* You can open the modal using document.getElementById('ID').showModal() method */}
-<button className="btn btn-warning"
- onClick={()=>(document.getElementById('my_modal_3')as HTMLDialogElement).showModal()}>
-  <PlusCircle className="w-4 h-4"/>
-  Ajouter une transaction
- </button>
-
-
-
-
-    <div className="overflow-x-auto rounded-2x1 border-2 border-warning/10
-    border-dashed bg-warning/5 ">
-  <table className="table">
-    {/* head */}
-    <thead>
-      <tr>
-        <th>#</th>
-        <th>Description</th>
-        <th>Montant</th>
-        <th>Date</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody>
-
-      {transactions.map((t, index)=>(
-      <tr
-      key={t.id}
-      >
-        <th>{index +1}</th>
-        <td>{t.text}</td>
-        <td className="font-semibold flex items-center gap-2">
-          {t.amount > 0 ?(
-            <TrendingUp className="text-success w-6 h-6"/>
-
-          ):(
-            <TrendingDown className="text-error w-6 h-6"/>
-
-          )}
-          {t.amount> 0? `+${t.amount}`: `${t.amount}`}
-
-          </td>
-        <td>
-          {formatDate(t.created_at)}
-        </td>
-
-        <td>
-          <button 
-          onClick={()=>deleteTransaction(t.id)}
-          className="btn btn-sm btn-error btn-soft"
-          title="Supprimer"
-          >
-            <Trash className="text-success w-4 h-4"/>
-          </button>
-        </td>
-      </tr> 
-      ))}
-     
-
-   
-    </tbody>
-  </table>
-</div>
-
-
-<dialog id="my_modal_3" className="modal backdrop-blur">
-  <div className="modal-box border-2 border-warning/10 border-dashed">
-    <form method="dialog">
-      {/* if there is a button in form, it will close the modal */}
-      <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
-    </form>
-    <h3 className="font-bold text-lg">Ajouter une transaction</h3>
-    <div className="flex flex-col gap-4 mt-4">
-      <div  className="flex flex-col gap-2">
-        <label className="label">Texte</label>
-        <input type="text" name="text" value={text} onChange={(e)=>setText(e.target.value)}
-        placeholder="Entrex le texte..."
-        className="input w-full" />
-
-      </div>
-
-      <div  className="flex flex-col gap-2">
-        <label className="label">Montant (négatif - dépense, positif - revenu)</label>
-        <input type="number" name="amount" value={amount} onChange={(e)=>setAmount(
-          e.target.value === "" ? "": Number(e.target.value))}
-        placeholder="Entrex le montant..."
-        className="input w-full" />
-
-      </div>
-
-      <button className="w-full btn btn-warning"
-      onClick={addTransaction}
-      disabled={loading}
-      >
-        <PlusCircle className="w-4 h-4"/>
-        Ajouter
-      </button>
-
-    </div>
-
-  </div>
-</dialog>
-
-   </div>
   );
 }
